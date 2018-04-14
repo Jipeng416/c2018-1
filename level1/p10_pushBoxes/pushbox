@@ -1,0 +1,98 @@
+#include <stdio.h>
+#define LINES 10
+#define COLUS 11
+#define boolean int
+#define true 1
+#define false 0
+void DrawMap(char Map[][COLUS]){
+    for (int i=0; i<LINES; i++) printf("%s\n",Map[i]);
+}
+void swap(char Map[][COLUS],int *x1,int *y1,int *x2,int *y2){
+    char temp;
+    temp = Map[*x1][*y1];
+    Map[*x1][*y1] = Map[*x2][*y2];
+    Map[*x2][*y2] = temp;
+    *x1 = *x2;
+    *y1 = *y2;
+}
+void playerChoice(int *nextpersonX,int *nextpersonY,int
+                  *nextboxX,int* nextboxY){
+    printf("请输入一个方向 [w,a,s,d]分别代表[上下左右]\n\n");
+    char direction = ' ';
+    scanf(" %c",&direction);
+    switch (direction) {
+        case 'w':
+        case 'W':
+            (*nextpersonX)--;
+            (*nextboxX)--;
+            break;
+        case 'a':
+        case 'A':
+            (*nextpersonY)--;
+            (*nextboxY)--;
+            break;
+        case 's':
+        case 'S':
+            (*nextpersonX)++;
+            (*nextboxX)++;
+            break;
+        case 'D':
+        case 'd':
+            (*nextpersonY)++;
+            (*nextboxY)++;
+            break;
+        default:
+            printf("\n!!!!输入错误 请重新输入:!!!!\n");
+            break;
+    }
+}
+boolean isLose(char map[][COLUS],int boxX,int boxY,char deadquater){
+    printf("(%d,%d)",boxX,boxY);
+    if(  (map[boxX+1][boxY] == deadquater&&map[boxX][boxY+1]==deadquater)
+       ||(map[boxX-1][boxY] == deadquater&&map[boxX][boxY+1]==deadquater)
+       ||(map[boxX-1][boxY] == deadquater&&map[boxX][boxY-1]==deadquater)
+       ||(map[boxX+1][boxY] == deadquater&& map[boxX][boxY-1]==deadquater)
+       ) return true;
+    return false;
+}
+int main()
+{
+    int persionX=1,persionY=1,boxX=2,boxY=2;
+    char you[] = "恭喜哈，成功啦！",street = ' ',box = 'X',wall = '#',you1[] = "游戏失败，继续努力哈！";
+    int winX = LINES - 2,winY = COLUS - 2;
+    char Map[LINES][COLUS] = {
+        "##########",
+        "#O #######",
+        "# X####  #",
+        "#        #",
+        "######   #",
+        "#  ####  #",
+        "#        #",
+        "#   ######",
+        "#         ",
+        "##########"
+    };
+    boolean isWin = false;
+    DrawMap(Map);
+    while (!isWin) {
+        int nextpersonX = persionX,nextpersonY = persionY,nextboxY = boxY,nextboxX = boxX;
+        playerChoice(&nextpersonX,&nextpersonY,&nextboxX,&nextboxY);
+        if(Map[nextboxX][nextboxY] == street&&
+           Map[nextpersonX][nextpersonY]==box){
+            swap(Map, &boxX, &boxY, &nextboxX, &nextboxY);
+            swap(Map, &persionX, &persionY, &nextpersonX, &nextpersonY);
+        }if(Map[nextpersonX][nextpersonY] == street)
+            swap(Map, &persionX, &persionY, &nextpersonX, &nextpersonY);
+        DrawMap(Map);
+        if(nextboxX == winX && nextboxY == winY) {
+            isWin = true;
+            printf("恭喜,胜利!过关~\n");
+            while (1) printf("%s",you);
+        }
+        if(isLose(Map,boxX,boxY,wall)) {
+            while(1) printf("%s",you1);
+            break;
+        }
+    }
+    return 0;
+}
